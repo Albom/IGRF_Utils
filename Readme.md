@@ -1,0 +1,1 @@
+Files in igrf/fortran_code were initially downloaded from https://ccmc.gsfc.nasa.gov/pub/modelweb/geomagnetic/igrf/fortran_code/
