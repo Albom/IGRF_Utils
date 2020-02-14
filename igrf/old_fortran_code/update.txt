@@ -1,0 +1,4 @@
+This is the source code of the 10th generation IGRF model (from 2005) 
+more recent generation models will be posted separately.
+
+Lutz Rastaetter - Community Coordinated Modeling Center (2018/09/17)
