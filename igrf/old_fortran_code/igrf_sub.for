@@ -206,7 +206,7 @@ C                          WHICH ACCURATE CALCULATION IS REQUIRED;
 C                          APPROXIMATION IS USED.
 C          B0           MAGNETIC FIELD STRENGTH IN GAUSS
 C-----------------------------------------------------------------------
-      DIMENSION         V(3),U(3,3),P(8,100),SP(3)
+      DIMENSION         V(3),U(3,3),P(8,3333),SP(3)
       COMMON            X(3),H(144)
       COMMON/FIDB0/     SP
       COMMON/GENER/     UMR,ERA,AQUAD,BQUAD
