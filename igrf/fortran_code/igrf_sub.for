@@ -217,7 +217,7 @@ C-- STEQ IS STEP SIZE FOR INTEGRATION
 C
       DATA RMIN,RMAX    /0.05,1.01/
       DATA STEP,STEQ    /0.20,0.03/
-        BEQU=1.E10
+      BEQU=1.E10
 C*****ENTRY POINT  SHELLG  TO BE USED WITH GEODETIC CO-ORDINATES
       RLAT=GLAT*UMR
       CT=SIN(RLAT)
@@ -228,7 +228,7 @@ C*****ENTRY POINT  SHELLG  TO BE USED WITH GEODETIC CO-ORDINATES
       RLON=GLON*UMR
       X(2)=X(1)*SIN(RLON)
       X(1)=X(1)*COS(RLON)
-      GOTO9
+      GOTO 9
       ENTRY SHELLC(V,FL,B0)
 C*****ENTRY POINT  SHELLC  TO BE USED WITH CARTESIAN CO-ORDINATES
       X(1)=V(1)
@@ -489,9 +489,9 @@ C                 POINTING IN THE TANGENTIAL PLANE TO THE NORTH, EAST
 C                 AND DOWNWARD.
 C-----------------------------------------------------------------------
       DIMENSION         V(3),B(3)
-      CHARACTER*12      NAME
-      COMMON            XI(3),H(144)
-      COMMON/MODEL/     NAME,NMAX,TIME,G(144)
+      CHARACTER*14      NAME
+      COMMON            XI(3),H(195)
+      COMMON/MODEL/     NAME,NMAX,TIME,G(195)
       COMMON/GENER/     UMR,ERA,AQUAD,BQUAD
 C
 C-- IS RECORDS ENTRY POINT
@@ -509,7 +509,7 @@ C*****ENTRY POINT  FELDG  TO BE USED WITH GEODETIC CO-ORDINATES
        RHO=(ALT+AQUAD/D)*ST/ERA
        XXX=RHO*CP
        YYY=RHO*SP
-      GOTO10
+      GOTO 10
       ENTRY FELDC(V,B)
 C*****ENTRY POINT  FELDC  TO BE USED WITH CARTESIAN CO-ORDINATES
       IS=2
@@ -520,7 +520,7 @@ C*****ENTRY POINT  FELDC  TO BE USED WITH CARTESIAN CO-ORDINATES
       XI(1)=XXX*RQ
       XI(2)=YYY*RQ
       XI(3)=ZZZ*RQ
-      GOTO20
+      GOTO 20
       ENTRY FELDI
 C*****ENTRY POINT  FELDI  USED FOR L COMPUTATION
       IS=3
@@ -548,7 +548,7 @@ C*****ENTRY POINT  FELDI  USED FOR L COMPUTATION
       H(IL+1)=G(IL+1)+Z*H(IH+1)+Y*H(IH+4)+X*(H(IH+3)-H(IH))
 5     H(IL)=G(IL)+Z*H(IH)+2.*(X*H(IH+1)+Y*H(IH+2))
       IH=IL
-      IF(I.GE.K)GOTO1
+      IF(I.GE.K)GOTO 1
 6     CONTINUE
       IF(IS.EQ.3)RETURN
       S=.5*H(1)+2.*(H(2)*XI(3)+H(3)*XI(1)+H(4)*XI(2))
@@ -556,7 +556,7 @@ C*****ENTRY POINT  FELDI  USED FOR L COMPUTATION
       BXXX=T*(H(3)-S*XXX)
       BYYY=T*(H(4)-S*YYY)
       BZZZ=T*(H(2)-S*ZZZ)
-      IF(IS.EQ.2)GOTO7
+      IF(IS.EQ.2)GOTO 7
       BABS=SQRT(BXXX*BXXX+BYYY*BYYY+BZZZ*BZZZ)
       BEAST=BYYY*CP-BXXX*SP
       BRHO=BYYY*SP+BXXX*CP
@@ -585,7 +585,7 @@ C  ### updated to IGRF-2005 version -dkb- 3/24/2005
 C-----------------------------------------------------------------------
         CHARACTER*14    FILMOD, FIL1, FIL2
 C ### FILMOD, DTEMOD arrays +1
-        DIMENSION       GH1(144),GH2(144),GHA(144),FILMOD(17),DTEMOD(17)
+        DIMENSION       GH1(195),GH2(195),GHA(195),FILMOD(17),DTEMOD(17)
         DOUBLE PRECISION X,F0,F
         COMMON/MODEL/   FIL1,NMAX,TIME,GH1
         COMMON/GENER/   UMR,ERAD,AQUAD,BQUAD
@@ -701,47 +701,21 @@ C       Open coefficient file. Read past first header record.
 C       Read degree and order of model and Earth's radius.
 C ---------------------------------------------------------------
       WRITE(FOUT,667) FSPEC
-c 667  FORMAT('/usr/local/etc/httpd/cgi-bin/natasha/IRI/',A12)
- 667  FORMAT(A12)
-        OPEN (IU, FILE=FOUT, STATUS='OLD', IOSTAT=IER, ERR=999)
+ 667  FORMAT(A14)
+      OPEN (IU, FILE=FOUT, STATUS='OLD', IOSTAT=IER, ERR=999)
 
        READ (IU, *, IOSTAT=IER, ERR=999)
-        READ (IU, *, IOSTAT=IER, ERR=999) NMAX, ERAD
-C ---------------------------------------------------------------
-C       Read the coefficient file, arranged as follows:
-C
-C                                       N     M     G     H
-C                                       ----------------------
-C                                   /   1     0    GH(1)  -
-C                                  /    1     1    GH(2) GH(3)
-C                                 /     2     0    GH(4)  -
-C                                /      2     1    GH(5) GH(6)
-C           NMAX*(NMAX+3)/2     /       2     2    GH(7) GH(8)
-C              records          \       3     0    GH(9)  -
-C                                \      .     .     .     .
-C                                 \     .     .     .     .
-C           NMAX*(NMAX+2)          \    .     .     .     .
-C           elements in GH          \  NMAX  NMAX   .     .
-C
-C       N and M are, respectively, the degree and order of the
-C       coefficient.
-C ---------------------------------------------------------------
+       READ (IU, *, IOSTAT=IER, ERR=999) NMAX, ERAD
 
-        I = 0
-        DO 2211 NN = 1, NMAX
-            DO 2233 MM = 0, NN
-                READ (IU, *, IOSTAT=IER, ERR=999) N, M, G, H
-                IF (NN .NE. N .OR. MM .NE. M) THEN
-                    IER = -2
-                    GOTO 999
-                ENDIF
-                I = I + 1
-                GH(I) = G
-                IF (M .NE. 0) THEN
-                    I = I + 1
-                    GH(I) = H
-                ENDIF
-2233        CONTINUE
+C      NMAX*(NMAX+2) elements in GH
+       I = 1
+       DO 2211 NN = 1, NMAX
+           DO 2233 MM = 1, NMAX+2
+
+           READ (IU, *, IOSTAT=IER, ERR=999) GH(I)
+           I=I+1
+
+2233       CONTINUE
 2211    CONTINUE
 
 999     CLOSE (IU)
